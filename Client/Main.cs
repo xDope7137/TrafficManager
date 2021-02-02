@@ -6,7 +6,6 @@ using System.IO;
 using TrafficManager.Helpers;
 using System.Linq;
 using System.Threading.Tasks;
-using CitizenFX.Core.UI;
 
 namespace TrafficManager
 {
@@ -101,11 +100,20 @@ namespace TrafficManager
                 Node.List.AddRange(nodes);
             });
 
-            RegisterCommand("trafficmenu", new Action<int, List<object>, string>((source, args, raw) =>
+            EventHandlers["TrafficManager:ToggleMenu"] += new Action(() =>
             {
                 Menu.Instance.Toggle();
+            });
+
+            // This would be registered on the server, but for some unbewnost reason RegisterKeyMapping fails to work with it on the server.
+            // This method is just as safe.
+            RegisterCommand("trafficmenu", new Action<int, List<object>, string>((source, args, raw) =>
+            {
+                TriggerServerEvent("TrafficManager:ToggleMenu");
             }), false);
-            RegisterKeyMapping("trafficmenu", "Traffic", "keyboard", "F5");
+
+            string defaultKey = GetResourceMetadata(GetCurrentResourceName(), "default_menu_button", 0) ?? "F5";
+            RegisterKeyMapping("trafficmenu", "Traffic", "keyboard", defaultKey);
 
             Menu.ForceLoad();
 

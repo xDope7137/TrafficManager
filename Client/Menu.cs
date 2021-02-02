@@ -22,9 +22,20 @@ namespace TrafficManager
             };
             menuPool.Add(mainMenu);
 
-            AddSpeedZoneMenu();
-            AddSecureZoneMenu();
-            EditNodeMenu();
+            if (IsConfigurationEnabled("use_speed_zones"))
+            {
+                AddSpeedZoneMenu();
+            }
+
+            if (IsConfigurationEnabled("use_secure_zones"))
+            {
+                AddSecureZoneMenu();
+            }
+
+            if (IsConfigurationEnabled("edit_traffic_nodes"))
+            {
+                EditNodeMenu();
+            }
         }
 
         private void AddSpeedZoneMenu()
@@ -37,8 +48,10 @@ namespace TrafficManager
             UIMenuListItem radius = new UIMenuListItem("Radius", radiusList, 0);
             submenu.AddItem(radius);
 
+            string speedType = GetResourceMetadata(GetCurrentResourceName(), "speed_type", 0) ?? "MPH";
+
             List<dynamic> speedList = new List<dynamic>() { 0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70 };
-            UIMenuListItem speed = new UIMenuListItem("Speed (MPH)", speedList, 0);
+            UIMenuListItem speed = new UIMenuListItem($"Speed ({speedType.ToUpper()})", speedList, 0);
             submenu.AddItem(speed);
 
             UIMenuItem create = new UIMenuItem("~b~Create");
@@ -51,7 +64,6 @@ namespace TrafficManager
             {
                 if (item == create)
                 {
-                    string speedType = GetResourceMetadata(GetCurrentResourceName(), "speed_type", 0) ?? "MPH";
                     float speedDiv = speedType.ToLower() == "mph" ? 2.237f : 3.59f;
 
                     SpeedZone.Create(radiusList[radius.Index], speedList[speed.Index] / speedDiv);
@@ -176,6 +188,12 @@ namespace TrafficManager
             }
         }
 
+        private bool IsConfigurationEnabled(string key)
+        {
+            string value = GetResourceMetadata(GetCurrentResourceName(), key, 0) ?? "false";
+            return value.ToLower() == "true";
+        }
+
         public static Menu Instance { get; }
 
         static Menu()
@@ -185,6 +203,8 @@ namespace TrafficManager
 
         public static void ForceLoad()
         {
+            if (Instance.speedZoneMenu == null) return;
+
             // If I don't pre-call a menu, the first time you open a menu with a dynamic list
             // The entire thread blocks for a second. So as a "workaroud".
             Instance.speedZoneMenu.Visible = true;
