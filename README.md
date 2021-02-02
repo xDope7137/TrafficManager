@@ -1,7 +1,7 @@
 # TrafficManager
 **TrafficManager** is a **FiveM** resource aiming to advance the way servers handle traffic management; providing access to toggle vehicle nodes, including other essentials such as speed zones and secure zones.
 
-Join the **Discord** [HERE](https://discord.gg/nC2krpN).
+Join the **Discord** [HERE](https://discord.gg/QFaFZwupaE).
 
 ## Usage
 **/trafficmenu** - Open or close the traffic menu.
